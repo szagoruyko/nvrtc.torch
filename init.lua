@@ -33,6 +33,14 @@ nvrtc.createProgram = function(kernel, includes, includeNames)
   return program
 end
 
+nvrtc.getLog = function(program)
+  local log_size = ffi.new'size_t[1]'
+  nvrtc.errcheck('nvrtcGetProgramLogSize', program[0], log_size)
+  local log = ffi.new('char[?]', tonumber(log_size[0]))
+  nvrtc.errcheck('nvrtcGetProgramLog', program[0], log)
+  return ffi.string(log)
+end
+
 nvrtc.compileProgram = function(program, args)
   local args_p = ffi.new('const char*[1]', nil)
   local args_n = 0
@@ -44,14 +52,9 @@ nvrtc.compileProgram = function(program, args)
       args_p[i] = ffi.new('const char[1]', args[i+1])
     end
   end
-  -- TODO: parse and test args
   local err = nvrtc.C.nvrtcCompileProgram(program[0], args_n, args_p)
   if err == 'NVRTC_ERROR_COMPILATION' then
-    local log_size = ffi.new'size_t[1]'
-    nvrtc.errcheck('nvrtcGetProgramLogSize', program[0], log_size)
-    local log = ffi.new('char[?]', tonumber(log_size[0]))
-    nvrtc.errcheck('nvrtcGetProgramLog', program[0], log)
-    error(ffi.string(log))
+    error(nvrtc.getLog(program))
   elseif err ~= 'NVRTC_SUCCESS' then
     local str = ffi.string(nvrtc.C.nvrtcGetErrorString(err))
     error('Error in NVRTC: ' .. str)
