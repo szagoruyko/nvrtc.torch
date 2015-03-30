@@ -3,7 +3,7 @@ nvrtc = {}
 include 'ffi.lua'
 local ffi = require 'ffi'
 
-nvrtc.errcheck = function(f, ...)
+function nvrtc.errcheck(f, ...)
    local status = nvrtc.C[f](...)
    if status ~= 'NVRTC_SUCCESS' then
       local str = ffi.string(nvrtc.C.nvrtcGetErrorString(status))
@@ -11,7 +11,7 @@ nvrtc.errcheck = function(f, ...)
    end
 end
 
-nvrtc.createProgram = function(kernel, includes, includeNames)
+function nvrtc.createProgram(kernel, includes, includeNames)
   assert(torch.type(kernel) == 'string')
   local includes_p = ffi.new('const char*[1]', nil)
   local includeNames_p = ffi.new('const char*[1]', nil)
@@ -33,7 +33,7 @@ nvrtc.createProgram = function(kernel, includes, includeNames)
   return program
 end
 
-nvrtc.getLog = function(program)
+function nvrtc.getLog(program)
   local log_size = ffi.new'size_t[1]'
   nvrtc.errcheck('nvrtcGetProgramLogSize', program[0], log_size)
   local log = ffi.new('char[?]', tonumber(log_size[0]))
@@ -41,7 +41,7 @@ nvrtc.getLog = function(program)
   return ffi.string(log)
 end
 
-nvrtc.compileProgram = function(program, args)
+function nvrtc.compile(program, args)
   local args_p = ffi.new('const char*[1]', nil)
   local args_n = 0
   if args then
@@ -61,7 +61,7 @@ nvrtc.compileProgram = function(program, args)
   end
 end
 
-nvrtc.getPTX = function(program)
+function nvrtc.getPTX(program)
   local ptx_size = ffi.new'size_t[1]'
   nvrtc.errcheck('nvrtcGetPTXSize', program[0], ptx_size)
   local ptx = ffi.new('char[?]', tonumber(ptx_size[0]))
@@ -69,8 +69,10 @@ nvrtc.getPTX = function(program)
   return ptx
 end
 
-nvrtc.compileReturnPTX = function(kernel, args, includes, includeNames)
+function nvrtc.compileReturnPTX(kernel, args, includes, includeNames)
   local program = nvrtc.createProgram(kernel, includes, includeNames)
-  nvrtc.compileProgram(program, args)
+  nvrtc.compile(program, args)
   return nvrtc.getPTX(program)
 end
+
+return nvrtc
