@@ -46,8 +46,8 @@ nvrtc.compileProgram = function(program, args)
   local args_n = 0
   if args then
     assert(torch.type(args) == 'table')
-    args_num = #args
-    args_p = ffi.new('const char*[?]', args_num)
+    args_n = #args
+    args_p = ffi.new('const char*[?]', args_n)
     for i=0,args_n-1 do
       args_p[i] = ffi.new('const char[1]', args[i+1])
     end
@@ -69,8 +69,8 @@ nvrtc.getPTX = function(program)
   return ptx
 end
 
-nvrtc.compileReturnPTX = function(kernel, includes, includeNames, args)
-  local program = nvrtc.createProgram(kernel, includes, includeNames, args)
+nvrtc.compileReturnPTX = function(kernel, args, includes, includeNames)
+  local program = nvrtc.createProgram(kernel, includes, includeNames)
   nvrtc.compileProgram(program, args)
   return nvrtc.getPTX(program)
 end
