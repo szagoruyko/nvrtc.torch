@@ -22,9 +22,9 @@ function nvrtc.createProgram(kernel, includes, includeNames)
     includes_n = #includes
     includes_p = ffi.new('const char*[?]', includes_n)
     includeNames_p = ffi.new('const char*[?]', includes_n)
-    for i=0,#includes_n-1 do
-      includes_p[i] = ffi.new('const char[1]', includes[i+1])
-      includeNames_p[i] = ffi.new('const char[1]', includeNames[i+1])
+    for i=1,includes_n do
+      includes_p[i-1] = ffi.new('const char[?]', #includes[i], includes[i])
+      includeNames_p[i-1] = ffi.new('const char[?]', #includeNames[i], includeNames[i])
     end
   end
   local program = ffi.new'nvrtcProgram[1]'
@@ -48,8 +48,8 @@ function nvrtc.compile(program, args)
     assert(torch.type(args) == 'table')
     args_n = #args
     args_p = ffi.new('const char*[?]', args_n)
-    for i=0,args_n-1 do
-      args_p[i] = ffi.new('const char[1]', args[i+1])
+    for i,v in ipairs(args) do
+      args_p[i-1] = ffi.new('const char[?]', #v, v)
     end
   end
   local err = nvrtc.C.nvrtcCompileProgram(program[0], args_n, args_p)
