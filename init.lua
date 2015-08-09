@@ -1,6 +1,5 @@
-require 'cutorch'
-nvrtc = {}
-include 'ffi.lua'
+local nvrtc = {}
+nvrtc.C = require 'nvrtc/ffi'
 local ffi = require 'ffi'
 
 function nvrtc.errcheck(f, ...)
@@ -12,13 +11,13 @@ function nvrtc.errcheck(f, ...)
 end
 
 function nvrtc.createProgram(kernel, includes, includeNames)
-  assert(torch.type(kernel) == 'string')
+  assert(type(kernel) == 'string')
   local includes_p = ffi.new('const char*[1]', nil)
   local includeNames_p = ffi.new('const char*[1]', nil)
   local includes_n = 0
   if includes or includeNames then
-    assert(torch.type(includes) == 'table', 'arg #2 has to be a table of include sources')
-    assert(torch.type(includeNames) == 'table', 'arg #3 has to be a table of include names') 
+    assert(type(includes) == 'table', 'arg #2 has to be a table of include sources')
+    assert(type(includeNames) == 'table', 'arg #3 has to be a table of include names') 
     includes_n = #includes
     includes_p = ffi.new('const char*[?]', includes_n)
     includeNames_p = ffi.new('const char*[?]', includes_n)
@@ -45,7 +44,7 @@ function nvrtc.compile(program, args)
   local args_p = ffi.new('const char*[1]', nil)
   local args_n = 0
   if args then
-    assert(torch.type(args) == 'table')
+    assert(type(args) == 'table')
     args_n = #args
     args_p = ffi.new('const char*[?]', args_n)
     for i,v in ipairs(args) do

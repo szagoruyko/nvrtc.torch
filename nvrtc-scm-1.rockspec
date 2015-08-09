@@ -13,11 +13,6 @@ description = {
    license = "BSD"
 }
 
-dependencies = {
-   "torch >= 7.0",
-   "cutorch",
-}
-
 build = {
    type = "command",
    build_command = [[

@@ -29,7 +29,8 @@ nvrtcResult nvrtcGetProgramLogSize(nvrtcProgram prog, size_t *logSizeRet);
 nvrtcResult nvrtcGetProgramLog(nvrtcProgram prog, char *log);
 ]]
 
-local ok,err = pcall(function() nvrtc.C = ffi.load('libnvrtc') end)
+local C
+local ok,err = pcall(function() C = ffi.load('libnvrtc') end)
 if not ok then
    print(err)
    error([['libnvrtc.so not found in library path.
@@ -37,3 +38,5 @@ Please install CUDA version 7 or higher.
 Then make sure all the files named as libnvrtc.so* are placed in your library load path (for example /usr/local/lib , or manually add a path to LD_LIBRARY_PATH)
 ]])
 end
+
+return C
