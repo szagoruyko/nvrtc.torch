@@ -5,7 +5,7 @@ Requires CUDA 7 installation.
 
 Example of usage:
 ```lua
-require 'nvrtc'
-ptx = nvrtc.compileReturnPTX(kernel)
+local nvrtc = require 'nvrtc'
+local ptx = nvrtc.compileReturnPTX(kernel)
 ```
 where kernel is a lua string with CUDA kernel code. Returned PTX can be loaded and ran with CUDA Driver API. More examples coming.
